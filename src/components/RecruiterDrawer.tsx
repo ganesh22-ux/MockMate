@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { RecruiterTelemetry } from '../types';
+import { MockMateDatabaseService } from '../services/db';
 import {
   X,
   Database,
@@ -25,6 +26,8 @@ export const RecruiterDrawer: React.FC<RecruiterDrawerProps> = ({ isOpen, onClos
   >('prisma');
 
   if (!isOpen) return null;
+
+  const livePrismaLogs = MockMateDatabaseService.getTelemetryTraces();
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm transition-opacity animate-fade-in">
@@ -66,7 +69,7 @@ export const RecruiterDrawer: React.FC<RecruiterDrawerProps> = ({ isOpen, onClos
             }`}
           >
             <Database className="w-3.5 h-3.5" />
-            <span>Prisma DB</span>
+            <span>Prisma DB ({livePrismaLogs.length})</span>
           </button>
 
           <button
@@ -137,22 +140,22 @@ export const RecruiterDrawer: React.FC<RecruiterDrawerProps> = ({ isOpen, onClos
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1">
-                  Active Database Engine (Prisma Client)
+                  Active Database Engine (Prisma ORM Client)
                 </h4>
                 <p className="text-xs text-gray-400">
-                  SQL/SQLite query trace showing model executions for User, ResumeAnalysis & AssessmentResult.
+                  SQLite query trace showing live model executions for User, SkillNode, ResumeAnalysis & AssessmentResult.
                 </p>
               </div>
 
               <div className="space-y-2 font-mono text-xs">
-                {telemetry.prismaLogs.map((log) => (
+                {livePrismaLogs.map((log) => (
                   <div
                     key={log.id}
-                    className="p-3 rounded-lg bg-black/60 border border-white/10 flex flex-col space-y-1"
+                    className="p-3 rounded-lg bg-black/60 border border-white/10 flex flex-col space-y-1 hover:border-cyan-500/30 transition-colors"
                   >
                     <div className="flex items-center justify-between text-[10px] text-gray-400">
                       <span className="text-cyan-400 font-semibold">[{log.id}]</span>
-                      <span>Execution Time: {log.durationMs}ms</span>
+                      <span className="text-gray-400">{log.timestamp} • {log.durationMs}ms</span>
                     </div>
                     <code className="text-emerald-300 break-all">{log.query}</code>
                   </div>

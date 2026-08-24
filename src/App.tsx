@@ -4,24 +4,47 @@ import { RadarChartComponent } from './components/RadarChart';
 import { HeroCards } from './components/HeroCards';
 import { CompanyGrid } from './components/CompanyGrid';
 import { RecruiterDrawer } from './components/RecruiterDrawer';
+import { ResumeAtsModal } from './components/ResumeAtsModal';
+import { ResumeDnaModal } from './components/ResumeDnaModal';
 import {
   mockPlacementMetrics,
   mockFeatureHeroCards,
   mockCompanyPacks,
   mockRecruiterTelemetry,
 } from './data/mockData';
-import { Layers, Terminal } from 'lucide-react';
+import type { DnaVerificationResult } from './services/resumeDnaEngine';
+import { Layers, Terminal, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
+  const [isDnaModalOpen, setIsDnaModalOpen] = useState(false);
+  const [dnaClaimedSkills, setDnaClaimedSkills] = useState<string[]>(['React.js', 'SQL', 'System Design']);
+  const [verifiedDnaBadge, setVerifiedDnaBadge] = useState<DnaVerificationResult | null>(null);
 
   const handleSelectCard = (cardId: string) => {
-    setSelectedFeature(cardId);
+    if (cardId === 'ats-resume-dna') {
+      setIsAtsModalOpen(true);
+    } else if (cardId === 'voice-interview') {
+      alert('1-on-1 Voice Interview selected! WebSockets & Multi-Agent Panel will unlock in Stage 4.');
+    } else if (cardId === 'wasm-dsa-proctor') {
+      alert('Proctored DSA Suite selected! Monaco & WebAssembly runner will unlock in Stage 5.');
+    }
   };
 
-  const handleSelectPack = (packId: string) => {
-    alert(`Selected Target Company Pack: ${packId.toUpperCase()}. Feature unlocked in upcoming stages!`);
+  const handleSelectPack = (_packId: string) => {
+    setIsAtsModalOpen(true);
+  };
+
+  const handleLaunchDnaChallenge = (skills: string[]) => {
+    setDnaClaimedSkills(skills);
+    setIsDnaModalOpen(true);
+  };
+
+  const handleCompleteVerification = (result: DnaVerificationResult) => {
+    if (result.passed) {
+      setVerifiedDnaBadge(result);
+    }
   };
 
   return (
@@ -30,7 +53,7 @@ export function App() {
       <Header
         onToggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)}
         isDrawerOpen={isDrawerOpen}
-        readinessScore={89}
+        readinessScore={verifiedDnaBadge?.passed ? 94 : 89}
       />
 
       {/* Main Content */}
@@ -52,19 +75,42 @@ export function App() {
             </p>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2.5">
+          <div className="mt-5 flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setIsAtsModalOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-xs transition-colors flex items-center space-x-2 shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Launch RAG ATS & Resume DNA Scanner</span>
+            </button>
+
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-xs transition-colors flex items-center space-x-2 shadow-sm"
+              className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
             >
               <Terminal className="w-3.5 h-3.5" />
               <span>Inspect Recruiter Architecture Drawer</span>
             </button>
-            <div className="px-3.5 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 flex items-center space-x-1.5">
-              <span>Stage 2 Complete • Prisma Database & SQLite Active</span>
-            </div>
           </div>
         </section>
+
+        {/* Verified Resume DNA Badge Display */}
+        {verifiedDnaBadge?.passed && (
+          <div className="p-3.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs flex items-center justify-between animate-fade-in">
+            <div className="flex items-center space-x-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div>
+                <span className="font-semibold text-zinc-100">🧬 Verified Resume DNA Badge Active!</span>
+                <span className="text-zinc-400 ml-2">
+                  Verified Skills: {verifiedDnaBadge.verifiedSkills.join(', ')} ({verifiedDnaBadge.scorePercentage}% Score)
+                </span>
+              </div>
+            </div>
+            <span className="px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded">
+              Readiness Boost +5%
+            </span>
+          </div>
+        )}
 
         {/* Dashboard Grid: Radar Chart + 3 Hero Cards */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -77,26 +123,26 @@ export function App() {
           </div>
         </section>
 
-        {/* Feedback Alert */}
-        {selectedFeature && (
-          <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs flex items-center justify-between">
-            <span>
-              Module <strong>[{selectedFeature}]</strong> selected. Deep functionality will activate in upcoming stages!
-            </span>
-            <button
-              onClick={() => setSelectedFeature(null)}
-              className="text-zinc-500 hover:text-zinc-300 font-bold px-2 py-0.5"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
         {/* Company Prep Packs Grid */}
         <section>
           <CompanyGrid packs={mockCompanyPacks} onSelectPack={handleSelectPack} />
         </section>
       </main>
+
+      {/* RAG ATS Resume Scorer Modal */}
+      <ResumeAtsModal
+        isOpen={isAtsModalOpen}
+        onClose={() => setIsAtsModalOpen(false)}
+        onLaunchDnaChallenge={handleLaunchDnaChallenge}
+      />
+
+      {/* Resume DNA 3-Minute Micro-Challenge Modal */}
+      <ResumeDnaModal
+        isOpen={isDnaModalOpen}
+        onClose={() => setIsDnaModalOpen(false)}
+        claimedSkills={dnaClaimedSkills}
+        onCompleteVerification={handleCompleteVerification}
+      />
 
       {/* Recruiter Drawer */}
       <RecruiterDrawer

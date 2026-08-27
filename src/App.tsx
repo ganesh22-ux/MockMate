@@ -7,6 +7,7 @@ import { RecruiterDrawer } from './components/RecruiterDrawer';
 import { ResumeAtsModal } from './components/ResumeAtsModal';
 import { ResumeDnaModal } from './components/ResumeDnaModal';
 import { VoiceInterviewModal } from './components/VoiceInterviewModal';
+import { DsaAssessmentModal } from './components/DsaAssessmentModal';
 import {
   mockPlacementMetrics,
   mockFeatureHeroCards,
@@ -14,13 +15,14 @@ import {
   mockRecruiterTelemetry,
 } from './data/mockData';
 import type { DnaVerificationResult } from './services/resumeDnaEngine';
-import { Layers, Terminal, Sparkles, CheckCircle2, Mic } from 'lucide-react';
+import { Layers, Terminal, Sparkles, CheckCircle2, Mic, Code } from 'lucide-react';
 
 export function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
   const [isDnaModalOpen, setIsDnaModalOpen] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isDsaModalOpen, setIsDsaModalOpen] = useState(false);
   const [dnaClaimedSkills, setDnaClaimedSkills] = useState<string[]>(['React.js', 'SQL', 'System Design']);
   const [verifiedDnaBadge, setVerifiedDnaBadge] = useState<DnaVerificationResult | null>(null);
 
@@ -30,7 +32,7 @@ export function App() {
     } else if (cardId === 'voice-interview') {
       setIsVoiceModalOpen(true);
     } else if (cardId === 'wasm-dsa-proctor') {
-      alert('Proctored DSA Suite selected! Monaco & WebAssembly runner will unlock in Stage 5.');
+      setIsDsaModalOpen(true);
     }
   };
 
@@ -83,7 +85,15 @@ export function App() {
               className="px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-xs transition-colors flex items-center space-x-2 shadow-sm"
             >
               <Mic className="w-3.5 h-3.5" />
-              <span>Start 1-on-1 AI Voice Interview</span>
+              <span>1-on-1 AI Voice Interview</span>
+            </button>
+
+            <button
+              onClick={() => setIsDsaModalOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
+            >
+              <Code className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Monaco DSA & Wasm Suite</span>
             </button>
 
             <button
@@ -91,7 +101,7 @@ export function App() {
               className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
             >
               <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
-              <span>RAG ATS & Resume DNA Scanner</span>
+              <span>RAG ATS & Resume DNA</span>
             </button>
 
             <button
@@ -138,6 +148,12 @@ export function App() {
           <CompanyGrid packs={mockCompanyPacks} onSelectPack={handleSelectPack} />
         </section>
       </main>
+
+      {/* Proctored Monaco DSA Code Runner & Timed Aptitude Suite Modal */}
+      <DsaAssessmentModal
+        isOpen={isDsaModalOpen}
+        onClose={() => setIsDsaModalOpen(false)}
+      />
 
       {/* 1-on-1 Multi-Agent AI Voice Interview Modal */}
       <VoiceInterviewModal

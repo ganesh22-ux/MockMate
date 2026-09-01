@@ -8,6 +8,8 @@ import { ResumeAtsModal } from './components/ResumeAtsModal';
 import { ResumeDnaModal } from './components/ResumeDnaModal';
 import { VoiceInterviewModal } from './components/VoiceInterviewModal';
 import { DsaAssessmentModal } from './components/DsaAssessmentModal';
+import { ProctoringModal } from './components/ProctoringModal';
+import { SkillGraphModal } from './components/SkillGraphModal';
 import {
   mockPlacementMetrics,
   mockFeatureHeroCards,
@@ -15,7 +17,7 @@ import {
   mockRecruiterTelemetry,
 } from './data/mockData';
 import type { DnaVerificationResult } from './services/resumeDnaEngine';
-import { Layers, Terminal, Sparkles, CheckCircle2, Mic, Code } from 'lucide-react';
+import { Layers, Terminal, Sparkles, CheckCircle2, Mic, Code, ShieldAlert, Network } from 'lucide-react';
 
 export function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -23,6 +25,9 @@ export function App() {
   const [isDnaModalOpen, setIsDnaModalOpen] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isDsaModalOpen, setIsDsaModalOpen] = useState(false);
+  const [isProctorModalOpen, setIsProctorModalOpen] = useState(false);
+  const [isSkillGraphModalOpen, setIsSkillGraphModalOpen] = useState(false);
+
   const [dnaClaimedSkills, setDnaClaimedSkills] = useState<string[]>(['React.js', 'SQL', 'System Design']);
   const [verifiedDnaBadge, setVerifiedDnaBadge] = useState<DnaVerificationResult | null>(null);
 
@@ -93,7 +98,23 @@ export function App() {
               className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
             >
               <Code className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Monaco DSA & Wasm Suite</span>
+              <span>Monaco DSA Suite</span>
+            </button>
+
+            <button
+              onClick={() => setIsSkillGraphModalOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
+            >
+              <Network className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Skill Graph Dijkstra Path</span>
+            </button>
+
+            <button
+              onClick={() => setIsProctorModalOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-xs transition-colors flex items-center space-x-2"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
+              <span>CV Proctor Feed</span>
             </button>
 
             <button
@@ -148,6 +169,18 @@ export function App() {
           <CompanyGrid packs={mockCompanyPacks} onSelectPack={handleSelectPack} />
         </section>
       </main>
+
+      {/* MediaPipe AI CV Proctoring Modal */}
+      <ProctoringModal
+        isOpen={isProctorModalOpen}
+        onClose={() => setIsProctorModalOpen(false)}
+      />
+
+      {/* Skill Knowledge Graph Modal */}
+      <SkillGraphModal
+        isOpen={isSkillGraphModalOpen}
+        onClose={() => setIsSkillGraphModalOpen(false)}
+      />
 
       {/* Proctored Monaco DSA Code Runner & Timed Aptitude Suite Modal */}
       <DsaAssessmentModal
